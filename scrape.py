@@ -78,7 +78,7 @@ for item in href:
 df = pd.DataFrame(list(zip(products, prices, productCode, itemAvailability, poids, href)),columns=["product name", "price", "product code", "available", "weight", "href"])
 
 ## exporting to excel
-df.to_excel("test.xlsx")
+df.to_excel("data.xlsx")
 
 print("end of the program")
 
