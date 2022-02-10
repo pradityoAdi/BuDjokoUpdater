@@ -4,11 +4,11 @@ from bs4 import BeautifulSoup
 import pandas as pd
 from selenium.webdriver.chrome.service import Service
 
+
+#initialisation
 ser = Service("BuDjoko-Scraper\chromedriver_win32\chromedriver.exe")
 op = webdriver.ChromeOptions()
 
-
-pagelinks = ["https://budjoko.fr/fr/epicerie-fine", "https://budjoko.fr/fr/boissons", "https://budjoko.fr/fr/sante-et-soins", "https://budjoko.fr/fr/non-alimentaire"]
 
 href = []
 products=[]
@@ -19,19 +19,22 @@ productCode=[]
 
 driver = webdriver.Chrome(service=ser, options=op)
 
+# pages to parse
+pagelinks = ["https://budjoko.fr/fr/epicerie-fine", "https://budjoko.fr/fr/boissons", "https://budjoko.fr/fr/sante-et-soins", "https://budjoko.fr/fr/non-alimentaire"]
 
+#opening those pages
 for i in pagelinks:
     print("parsing "+ i)
 
-    # driver.get("https://budjoko.fr/fr/boissons")
+    ##opening page i
     driver.get(i)
 
-
+    # scrolling and waiting because it takes time for the page to load (javascript de merde)
     ScrollNumber=5
     for i in range(1, ScrollNumber):
         time.sleep(5)
         driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        
+    
     content = driver.page_source
     soup = BeautifulSoup(content, features="html.parser")
         
@@ -42,16 +45,14 @@ for i in pagelinks:
         productCode.append(e.find('span', {'class':'hikashop_product_code_list'}).find('a').text.replace('\n','').replace('\t',''))
 
 
-print(href)
-print(products)
-print(prices)
-print(productCode)
 
-print(len(href))
-print(len(products))
-print(len(prices))
-print(len(productCode))
 
-# expecting 260 items 
+#creating a data frame and export to excel
+## creating data frame based on created list
+df = pd.DataFrame(list(zip(products, prices, productCode, href)),columns=["product name", "price", "product code", "href"])
+
+## exporting to excel
+df.to_excel("test.xlsx")
+
 print("end of the program")
 
