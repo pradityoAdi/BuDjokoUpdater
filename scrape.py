@@ -9,12 +9,17 @@ from selenium.webdriver.chrome.service import Service
 ser = Service("BuDjoko-Scraper\chromedriver_win32\chromedriver.exe")
 op = webdriver.ChromeOptions()
 
+# disable all the errors getting displayed on Console
+op.add_experimental_option('excludeSwitches', ['enable-logging'])
+# hide browser (theorically faster)
+op.add_argument("--headless")
 
 href = []
 products=[]
 prices=[]
 productCode=[]
 itemAvailability=[]
+poids = []
 
 
 
@@ -47,9 +52,30 @@ for i in pagelinks:
         itemAvailability.append(e.find('span', {'class':'hikashop_product_stock_count'}).text)
 
 
+## scraping weight of each item
+counter = 1
+for item in href:
+    print("parsing " , counter , " of " , len(href) , " items")
+    counter+=1
+
+    driver.get(item)
+
+    time.sleep(2)
+    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+    itemPageContent = driver.page_source
+    itemPageSoup = BeautifulSoup(itemPageContent, features="html.parser")
+    
+    weight = itemPageSoup.find('span', {'class':'hikashop_product_weight_main'})
+    # to avoid AttributeError: 'NoneType' object has no attribute 'text'
+    if(weight != None):
+        poids.append(weight.text)
+    else:
+        poids.append("-1")
+
+
 #creating a data frame and export to excel
 ## creating data frame based on created list
-df = pd.DataFrame(list(zip(products, prices, productCode, href, itemAvailability)),columns=["product name", "price", "product code", "href", "available"])
+df = pd.DataFrame(list(zip(products, prices, productCode, itemAvailability, poids, href)),columns=["product name", "price", "product code", "available", "weight", "href"])
 
 ## exporting to excel
 df.to_excel("test.xlsx")
