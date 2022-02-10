@@ -11,7 +11,7 @@ op = webdriver.ChromeOptions()
 
 # disable all the errors getting displayed on Console
 op.add_experimental_option('excludeSwitches', ['enable-logging'])
-# hide browser (theorically faster)
+# hide browser
 op.add_argument("--headless")
 
 href = []
@@ -78,7 +78,7 @@ for item in href:
 df = pd.DataFrame(list(zip(products, prices, productCode, itemAvailability, poids, href)),columns=["product name", "price", "product code", "available", "weight", "href"])
 
 ## exporting to excel
-df.to_excel("data.xlsx")
+df.to_excel("scraped.xlsx")
 
 print("end of the program")
 
