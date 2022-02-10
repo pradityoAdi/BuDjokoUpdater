@@ -14,6 +14,7 @@ href = []
 products=[]
 prices=[]
 productCode=[]
+itemAvailability=[]
 
 
 
@@ -43,13 +44,12 @@ for i in pagelinks:
         products.append(e.find('a')['title'])
         prices.append(e.find('span', {"class":"hikashop_product_price"}).text)
         productCode.append(e.find('span', {'class':'hikashop_product_code_list'}).find('a').text.replace('\n','').replace('\t',''))
-
-
+        itemAvailability.append(e.find('span', {'class':'hikashop_product_stock_count'}).text)
 
 
 #creating a data frame and export to excel
 ## creating data frame based on created list
-df = pd.DataFrame(list(zip(products, prices, productCode, href)),columns=["product name", "price", "product code", "href"])
+df = pd.DataFrame(list(zip(products, prices, productCode, href, itemAvailability)),columns=["product name", "price", "product code", "href", "available"])
 
 ## exporting to excel
 df.to_excel("test.xlsx")
