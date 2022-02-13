@@ -8,7 +8,7 @@ from multiprocessing import Pool
 
 def getItemList(url):
     #initialisation
-    ser = Service("chromedriver_win32\chromedriver.exe")
+    ser = Service("/home/pradityoadi/Documents/Code/BuDjokoUpdater/chromedriver")
     op = webdriver.ChromeOptions()
 
     # disable all the errors getting displayed on Console
@@ -32,7 +32,7 @@ def getItemList(url):
     # scrolling and waiting because it takes time for the page to load (javascript de merde)
     ScrollNumber=5
     for i in range(1, ScrollNumber):
-        time.sleep(5)
+        time.sleep(7)
         driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
     
     content = driver.page_source
@@ -87,7 +87,7 @@ def getItemList(url):
 
 def getWeightItem(url):
     #initialisation
-    ser = Service("chromedriver_win32\chromedriver.exe")
+    ser = Service("/home/pradityoadi/Documents/Code/BuDjokoUpdater/chromedriver")
     op = webdriver.ChromeOptions()
 
     # disable all the errors getting displayed on Console
@@ -154,17 +154,18 @@ if __name__ == '__main__':
         form.append(e[5])
 
 
-    href=href[0]
-    products=products[0]
-    prices=prices[0]
-    productCode=productCode[0]
-    itemAvailability=itemAvailability[0]
-    form=form[0]
+    href = [item for sublist in href for item in sublist]
+    products = [item for sublist in products for item in sublist]
+    prices = [item for sublist in prices for item in sublist]
+    productCode = [item for sublist in productCode for item in sublist]
+    itemAvailability = [item for sublist in itemAvailability for item in sublist]
+    form = [item for sublist in form for item in sublist]
 
     print("main page scraped")
 
     # driver.close()
-
+    print("length of the list is : ")
+    print(len(href))
 
     poids = []
     p = Pool(12)
