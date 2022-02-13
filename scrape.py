@@ -18,6 +18,14 @@ def getItemList(url):
 
     driver = webdriver.Chrome(service=ser, options=op)
 
+    ##
+    hrefList = list()
+    productList= list()
+    priceList= list()
+    productCodeList= list()
+    itemAvailabilityList= list()
+    formList= list()
+
     ##opening page 
     driver.get(url)
 
@@ -34,10 +42,12 @@ def getItemList(url):
     for e in soup.find_all('div', {"class":"hkc-md-2"}):
         # append the product's hyperlink
         href = e.find('a')['href']
+        hrefList.append(href)
+
 
         # append the product's title
         product = e.find('a')['title']
-        print(product)
+        productList.append(product)
 
         # If the price isn't discounted then append full price.
         # replace comma with point and then convert text to float
@@ -45,9 +55,11 @@ def getItemList(url):
             price = float(e.find('span', {"class":"hikashop_product_price"}).text.replace('€','').replace(' ','').replace(',','.'))
         else:
             price = float(e.find('span', {"class":"hikashop_product_price_with_discount"}).text.replace('€','').replace(' ','').replace(',','.'))
+        priceList.append(price)
         
         # append the product's code, eliminate whitespaces
         productCode = e.find('span', {'class':'hikashop_product_code_list'}).find('a').text.replace('\n','').replace('\t','') 
+        productCodeList.append(productCode)
 
         # append the product's availability (add "Stock épuisé" if no more stock)
         if(e.find('span', {'class':'hikashop_product_stock_count'}).text.replace('\n','').replace('\t','') != None):
@@ -55,6 +67,8 @@ def getItemList(url):
         else:
             itemAvailability = e.find('span', {'class':'hikashop_product_stock_count'}).text.replace('\n','').replace('\t','')
         
+        itemAvailabilityList.append(itemAvailability)
+
         # append add to cart hyperlink (will be used to execute orders)
         linkToCart = e.find('a',{'class':'hikabtn hikacart'})
         
@@ -62,9 +76,13 @@ def getItemList(url):
             form = "not available"
         else:
             form = linkToCart['href']
+
+        formList.append(form)
+
     driver.close()
     
-    return href, product, price, productCode, itemAvailability, form
+    return [hrefList, productList, priceList, productCodeList, itemAvailabilityList, formList]
+    
     
 
 def getWeightItem(url):
@@ -116,15 +134,33 @@ if __name__ == '__main__':
 
     itemsProcesses = Pool(4)
 
-    # pages = ["https://budjoko.fr/fr/epicerie-fine", "https://budjoko.fr/fr/boissons", "https://budjoko.fr/fr/sante-et-soins", "https://budjoko.fr/fr/non-alimentaire"]
-    pages = ["https://budjoko.fr/fr/epicerie-fine"]
-    # href, products, prices, productCode, itemAvailability, form = itemsProcesses.map(getItemList, pages)
-    lst =[]
-    lst = itemsProcesses.map(getItemList, pages)
-    print(lst)
-    print("quitted")
+    pages = ["https://budjoko.fr/fr/epicerie-fine", "https://budjoko.fr/fr/boissons", "https://budjoko.fr/fr/sante-et-soins", "https://budjoko.fr/fr/non-alimentaire"]
+    
+    itemList = itemsProcesses.map(getItemList, pages)
+    
+    
+    
+    
     itemsProcesses.terminate()
     itemsProcesses.join()
+
+    for e in itemList:
+        
+        href.append( e[0])
+        products.append(e[1])
+        prices.append(e[2])
+        productCode.append(e[3])
+        itemAvailability.append(e[4])
+        form.append(e[5])
+
+
+    href=href[0]
+    products=products[0]
+    prices=prices[0]
+    productCode=productCode[0]
+    itemAvailability=itemAvailability[0]
+    form=form[0]
+
     print("main page scraped")
 
     # driver.close()
@@ -146,6 +182,4 @@ if __name__ == '__main__':
     df.to_excel("scraped.xlsx")
 
     print(df)
-    print(type(poids))
-    print(type(products))
     print("end of the program")
